@@ -2,49 +2,75 @@
 
 namespace App\Filament\Resources\Clients;
 
-use App\Filament\Resources\Clients\Pages\CreateClient;
-use App\Filament\Resources\Clients\Pages\EditClient;
-use App\Filament\Resources\Clients\Pages\ListClients;
-use App\Filament\Resources\Clients\Schemas\ClientForm;
-use App\Filament\Resources\Clients\Tables\ClientsTable;
+use App\Filament\Resources\Clients\Pages;
 use App\Models\Client;
-use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables;
 use Filament\Tables\Table;
 
 class ClientResource extends Resource
 {
     protected static ?string $model = Client::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-briefcase';
+    }
 
-    protected static ?string $recordTitleAttribute = 'name';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Master Data';
+    }
 
     public static function form(Schema $schema): Schema
     {
-        return ClientForm::configure($schema);
+        return $schema
+            ->components([
+                TextInput::make('code')
+                    ->label('Kode Klien (Inisial)')
+                    ->required()
+                    ->unique(ignoreRecord: true),
+                TextInput::make('name')
+                    ->label('Nama Perusahaan Klien')
+                    ->required(),
+                TextInput::make('contact_person')
+                    ->label('PIC / Contact Person'),
+                TextInput::make('phone')
+                    ->label('No. Telepon / WhatsApp')
+                    ->tel(),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
-        return ClientsTable::configure($table);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('code')
+                    ->label('Kode')
+                    ->badge()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nama Klien')
+                    ->searchable()
+                    ->weight('bold'),
+                Tables\Columns\TextColumn::make('contact_person')
+                    ->label('PIC'),
+                Tables\Columns\TextColumn::make('phone')
+                    ->label('Telepon'),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListClients::route('/'),
-            'create' => CreateClient::route('/create'),
-            'edit' => EditClient::route('/{record}/edit'),
+            'index' => Pages\ListClients::route('/'),
+            'create' => Pages\CreateClient::route('/create'),
+            'edit' => Pages\EditClient::route('/{record}/edit'),
         ];
     }
 }
