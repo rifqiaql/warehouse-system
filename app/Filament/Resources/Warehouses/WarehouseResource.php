@@ -1,15 +1,18 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Warehouses;
 
-use App\Filament\Resources\WarehouseResource\Pages;
+use App\Filament\Resources\Warehouses\Pages;
 use App\Models\Warehouse;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class WarehouseResource extends Resource
@@ -55,22 +58,27 @@ class WarehouseResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('code')
+                TextColumn::make('code')
                     ->label('Kode')
                     ->badge()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Nama Gudang')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('type')
+                TextColumn::make('type')
                     ->label('Tipe')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'physical' => 'success',
                         'virtual_site' => 'warning',
                         default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'physical' => 'Fisik',
+                        'virtual_site' => 'Virtual Site',
+                        default => $state,
                     }),
-                Tables\Columns\TextColumn::make('location')
+                TextColumn::make('location')
                     ->label('Lokasi')
                     ->limit(50),
             ])
@@ -78,11 +86,11 @@ class WarehouseResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
