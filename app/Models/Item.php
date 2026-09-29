@@ -12,15 +12,19 @@ class Item extends Model
 
     protected $guarded = [];
 
-    // Relasi ke stok consumable di semua gudang
-    public function consumableStocks(): HasMany
-    {
-        return $this->hasMany(ConsumableStock::class);
-    }
-
-    // Relasi ke unit fisik alat (berbasis asset tag)
+    /**
+     * Jika item bertipe 'tool', item ini punya banyak unit fisik (assets)
+     */
     public function toolAssets(): HasMany
     {
         return $this->hasMany(ToolAsset::class);
+    }
+
+    /**
+     * Riwayat item pada surat jalan keluar
+     */
+    public function deliveryOrderOutItems(): HasMany
+    {
+        return $this->hasMany(DeliveryOrderOutItem::class);
     }
 }

@@ -23,6 +23,7 @@ return new class extends Migration {
             $table->foreignId('client_id')->constrained('clients')->restrictOnDelete();
             $table->string('code', 50)->unique();
             $table->string('name', 200);
+            $table->string('location', 200)->nullable(); // Lokasi Site Lapangan
             $table->string('status', 30)->default('active'); // planning, active, completed, suspended
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();

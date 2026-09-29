@@ -9,7 +9,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -41,25 +40,26 @@ class ProjectResource extends Resource
                     ->preload()
                     ->required(),
 
+                TextInput::make('code')
+                    ->label('Kode Proyek')
+                    ->placeholder('Misal: PRJ-PTM-001')
+                    ->required()
+                    ->unique(ignoreRecord: true),
+
                 TextInput::make('name')
                     ->label('Nama Proyek')
                     ->placeholder('Misal: Maintenance Kilang Balongan Unit IV')
                     ->required(),
 
                 TextInput::make('location')
-                    ->label('Lokasi Site Lapangan')
+                    ->label('Lokasi Site / Tempat Proyek')
                     ->placeholder('Misal: Balongan, Indramayu')
                     ->required(),
-
-                DatePicker::make('start_date')
-                    ->label('Tanggal Mulai Proyek'),
-
-                DatePicker::make('end_date')
-                    ->label('Estimasi Selesai'),
 
                 Select::make('status')
                     ->label('Status Proyek')
                     ->options([
+                        'planning' => 'Perencanaan (Planning)',
                         'active' => 'Aktif / Berjalan',
                         'completed' => 'Selesai',
                         'suspended' => 'Ditunda / On Hold',
@@ -67,9 +67,11 @@ class ProjectResource extends Resource
                     ->default('active')
                     ->required(),
 
-                Textarea::make('description')
-                    ->label('Keterangan Tambahan')
-                    ->columnSpanFull(),
+                DatePicker::make('start_date')
+                    ->label('Tanggal Mulai Proyek'),
+
+                DatePicker::make('end_date')
+                    ->label('Estimasi Selesai'),
             ]);
     }
 
@@ -77,6 +79,11 @@ class ProjectResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('code')
+                    ->label('Kode Proyek')
+                    ->badge()
+                    ->searchable(),
+
                 TextColumn::make('name')
                     ->label('Nama Proyek')
                     ->searchable()
@@ -96,12 +103,14 @@ class ProjectResource extends Resource
                     ->label('Status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
+                        'planning' => 'gray',
                         'active' => 'success',
-                        'completed' => 'gray',
+                        'completed' => 'info',
                         'suspended' => 'danger',
                         default => 'warning',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'planning' => 'Planning',
                         'active' => 'Aktif',
                         'completed' => 'Selesai',
                         'suspended' => 'On Hold',
