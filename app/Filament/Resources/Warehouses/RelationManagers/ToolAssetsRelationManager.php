@@ -30,7 +30,34 @@ class ToolAssetsRelationManager extends RelationManager
                     ->relationship('item', 'name')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->createOptionForm([
+                        TextInput::make('item_code')
+                            ->label('Kode Barang')
+                            ->placeholder('Misal: TLS-WLD-02')
+                            ->required(),
+                        TextInput::make('name')
+                            ->label('Nama Barang / Mesin')
+                            ->placeholder('Misal: Trafo Las 400A')
+                            ->required(),
+                        Select::make('type')
+                            ->label('Tipe')
+                            ->options([
+                                'tool' => 'Tool / Aset',
+                                'consumable' => 'Consumable',
+                            ])
+                            ->default('tool')
+                            ->required(),
+                        TextInput::make('unit')
+                            ->label('Satuan')
+                            ->default('Unit')
+                            ->required(),
+                        TextInput::make('minimum_stock')
+                            ->label('Batas Minimum Stok')
+                            ->numeric()
+                            ->default(0)
+                            ->required(),
+                    ]),
 
                 TextInput::make('asset_tag')
                     ->label('Kode Tag Aset')
