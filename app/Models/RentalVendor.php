@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Item extends Model
+class RentalVendor extends Model
 {
     use HasFactory;
 
@@ -15,10 +15,5 @@ class Item extends Model
     public function toolAssets(): HasMany
     {
         return $this->hasMany(ToolAsset::class);
-    }
-
-    public function consumableStocks(): HasMany
-    {
-        return $this->hasMany(ConsumableStock::class);
     }
 }

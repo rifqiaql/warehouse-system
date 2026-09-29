@@ -1,68 +1,52 @@
 <?php
 
-namespace App\Filament\Resources\ToolAssets;
+namespace App\Filament\Resources\Warehouses\RelationManagers;
 
-use App\Filament\Resources\ToolAssets\Pages;
-use App\Models\ToolAsset;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class ToolAssetResource extends Resource
+class ToolAssetsRelationManager extends RelationManager
 {
-    protected static ?string $model = ToolAsset::class;
+    protected static string $relationship = 'toolAssets';
 
-    public static function getNavigationIcon(): ?string
-    {
-        return 'heroicon-o-wrench-screwdriver';
-    }
+    protected static ?string $title = 'Daftar Unit Alat & Mesin di Gudang Ini';
 
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Master Data';
-    }
-
-    public static function form(Schema $schema): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Select::make('item_id')
-                    ->label('Tipe / Jenis Alat')
+                    ->label('Katalog Barang / Alat')
                     ->relationship('item', 'name')
                     ->searchable()
                     ->preload()
                     ->required(),
 
                 TextInput::make('asset_tag')
-                    ->label('Kode Tag Aset / No. Registrasi')
+                    ->label('Kode Tag Aset')
                     ->placeholder('Contoh: AST-WLD-001')
                     ->required()
                     ->unique(ignoreRecord: true),
 
                 TextInput::make('serial_number')
-                    ->label('Nomor Seri Pabrik (Serial Number)')
-                    ->placeholder('Misal: SN-882910-X'),
-
-                Select::make('current_warehouse_id')
-                    ->label('Posisi Gudang Saat Ini')
-                    ->relationship('currentWarehouse', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
+                    ->label('Nomor Seri Pabrik (SN)')
+                    ->placeholder('Misal: SN-99821-X'),
 
                 Select::make('current_status')
-                    ->label('Kondisi / Status Fisik')
+                    ->label('Status Kondisi')
                     ->options([
                         'available' => 'Tersedia di Gudang (Ready)',
-                        'in_use' => 'Sedang Dipakai di Site Proyek',
+                        'in_use' => 'Sedang Dipakai di Lapangan',
                         'maintenance' => 'Dalam Perbaikan / Rusak',
                         'lost' => 'Hilang',
                         'scrapped' => 'Afkir / Dibuang',
@@ -71,7 +55,7 @@ class ToolAssetResource extends Resource
                     ->required(),
 
                 Select::make('ownership_type')
-                    ->label('Status Kepemilikan')
+                    ->label('Kepemilikan')
                     ->options([
                         'owned' => 'Milik Sendiri',
                         'rented' => 'Sewa Vendor (Rental)',
@@ -85,33 +69,31 @@ class ToolAssetResource extends Resource
                     ->visible(fn ($get) => $get('ownership_type') === 'rented'),
 
                 Textarea::make('condition_note')
-                    ->label('Catatan Kondisi / Kelengkapan')
+                    ->label('Catatan Kondisi')
                     ->columnSpanFull(),
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('asset_tag')
             ->columns([
                 TextColumn::make('asset_tag')
-                    ->label('Asset Tag')
+                    ->label('Tag Aset')
                     ->badge()
+                    ->color('warning')
                     ->searchable(),
 
                 TextColumn::make('item.name')
-                    ->label('Nama Alat')
-                    ->searchable()
-                    ->weight('bold'),
-
-                TextColumn::make('serial_number')
-                    ->label('Serial No.')
+                    ->label('Nama Alat / Mesin')
+                    ->weight('bold')
                     ->searchable(),
 
-                TextColumn::make('currentWarehouse.name')
-                    ->label('Lokasi Gudang')
-                    ->badge()
-                    ->color('gray'),
+                TextColumn::make('serial_number')
+                    ->label('Serial Number')
+                    ->searchable()
+                    ->default('-'),
 
                 TextColumn::make('current_status')
                     ->label('Status')
@@ -131,23 +113,20 @@ class ToolAssetResource extends Resource
                         'scrapped' => 'Afkir',
                         default => $state,
                     }),
+
+                TextColumn::make('ownership_type')
+                    ->label('Kepemilikan')
+                    ->badge()
+                    ->color(fn (string $state): string => $state === 'owned' ? 'gray' : 'warning')
+                    ->formatStateUsing(fn (string $state): string => $state === 'owned' ? 'Milik Sendiri' : 'Sewa'),
+            ])
+            ->headerActions([
+                CreateAction::make()->label('Tambah Unit Alat Baru'),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                DeleteAction::make(),
             ]);
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListToolAssets::route('/'),
-            'create' => Pages\CreateToolAsset::route('/create'),
-            'edit' => Pages\EditToolAsset::route('/{record}/edit'),
-        ];
     }
 }

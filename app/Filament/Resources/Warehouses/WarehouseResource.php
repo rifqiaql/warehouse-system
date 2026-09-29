@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Warehouses;
 
 use App\Filament\Resources\Warehouses\Pages;
+use App\Filament\Resources\Warehouses\RelationManagers;
 use App\Models\Warehouse;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -37,9 +38,11 @@ class WarehouseResource extends Resource
                     ->label('Kode Gudang')
                     ->required()
                     ->unique(ignoreRecord: true),
+
                 TextInput::make('name')
                     ->label('Nama Gudang')
                     ->required(),
+
                 Select::make('type')
                     ->label('Tipe Gudang')
                     ->options([
@@ -48,6 +51,7 @@ class WarehouseResource extends Resource
                     ])
                     ->default('physical')
                     ->required(),
+
                 Textarea::make('location')
                     ->label('Lokasi / Alamat')
                     ->columnSpanFull(),
@@ -62,9 +66,11 @@ class WarehouseResource extends Resource
                     ->label('Kode')
                     ->badge()
                     ->searchable(),
+
                 TextColumn::make('name')
                     ->label('Nama Gudang')
                     ->searchable(),
+
                 TextColumn::make('type')
                     ->label('Tipe')
                     ->badge()
@@ -78,6 +84,7 @@ class WarehouseResource extends Resource
                         'virtual_site' => 'Virtual Site',
                         default => $state,
                     }),
+
                 TextColumn::make('location')
                     ->label('Lokasi')
                     ->limit(50),
@@ -93,6 +100,13 @@ class WarehouseResource extends Resource
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\ToolAssetsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
