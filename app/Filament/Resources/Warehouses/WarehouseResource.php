@@ -86,10 +86,19 @@ class WarehouseResource extends Resource
                     }),
 
                 TextColumn::make('tool_assets_count')
-                    ->label('Total Unit Alat')
+                    ->label('Aset Alat / Mesin')
                     ->counts('toolAssets')
                     ->badge()
                     ->color('info')
+                    ->formatStateUsing(fn ($state) => "{$state} Unit")
+                    ->alignCenter(),
+
+                TextColumn::make('consumable_stocks_count')
+                    ->label('Material Habis Pakai')
+                    ->counts('consumableStocks')
+                    ->badge()
+                    ->color('success')
+                    ->formatStateUsing(fn ($state) => "{$state} Jenis")
                     ->alignCenter(),
 
                 TextColumn::make('location')
