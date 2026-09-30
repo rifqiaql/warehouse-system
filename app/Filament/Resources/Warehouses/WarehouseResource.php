@@ -85,6 +85,13 @@ class WarehouseResource extends Resource
                         default => $state,
                     }),
 
+                TextColumn::make('tool_assets_count')
+                    ->label('Total Unit Alat')
+                    ->counts('toolAssets')
+                    ->badge()
+                    ->color('info')
+                    ->alignCenter(),
+
                 TextColumn::make('location')
                     ->label('Lokasi')
                     ->limit(50),
@@ -106,6 +113,7 @@ class WarehouseResource extends Resource
     {
         return [
             RelationManagers\ToolAssetsRelationManager::class,
+            RelationManagers\ConsumableStocksRelationManager::class,
         ];
     }
 

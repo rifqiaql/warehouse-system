@@ -2,95 +2,79 @@
 
 namespace App\Filament\Resources\Warehouses\RelationManagers;
 
-use Filament\Actions\AssociateAction;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateAction;
-use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ConsumableStocksRelationManager extends RelationManager
 {
     protected static string $relationship = 'consumableStocks';
+
+    protected static ?string $title = 'Stok Material & Habis Pakai (Bulk/Jumlah)';
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Select::make('item_id')
-                    ->relationship('item', 'name')
+                    ->label('Pilih Material / Consumable')
+                    ->relationship(
+                        name: 'item',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn (Builder $query) => $query->where('type', 'consumable')
+                    )
+                    ->searchable()
+                    ->preload()
                     ->required(),
-                TextInput::make('quantity')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-            ]);
-    }
 
-    public function infolist(Schema $schema): Schema
-    {
-        return $schema
-            ->components([
-                TextEntry::make('item.name')
-                    ->label('Item'),
-                TextEntry::make('quantity')
-                    ->numeric(),
-                TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('updated_at')
-                    ->dateTime()
-                    ->placeholder('-'),
+                TextInput::make('quantity')
+                    ->label('Jumlah Stok')
+                    ->numeric()
+                    ->placeholder('Misal: 100')
+                    ->minValue(0)
+                    ->required(),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('id')
+            ->recordTitleAttribute('item.name')
             ->columns([
-                TextColumn::make('item.name')
+                TextColumn::make('item.item_code')
+                    ->label('Kode')
+                    ->badge()
+                    ->color('warning')
                     ->searchable(),
+
+                TextColumn::make('item.name')
+                    ->label('Nama Barang')
+                    ->weight('bold')
+                    ->searchable(),
+
                 TextColumn::make('quantity')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                //
+                    ->label('Jumlah Stok')
+                    ->badge()
+                    ->color(fn (int $state): string => $state > 0 ? 'success' : 'danger')
+                    ->alignCenter(),
+
+                TextColumn::make('item.unit')
+                    ->label('Satuan')
+                    ->alignCenter(),
             ])
             ->headerActions([
-                CreateAction::make(),
-                AssociateAction::make(),
+                CreateAction::make()->label('Tambah Stok Material'),
             ])
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                DissociateAction::make(),
+            ->actions([
+                EditAction::make()->label('Ubah Qty'),
                 DeleteAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DissociateBulkAction::make(),
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }

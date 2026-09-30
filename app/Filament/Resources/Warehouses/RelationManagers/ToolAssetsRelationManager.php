@@ -7,6 +7,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -14,6 +15,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class ToolAssetsRelationManager extends RelationManager
@@ -36,7 +38,11 @@ class ToolAssetsRelationManager extends RelationManager
             ->components([
                 Select::make('item_id')
                     ->label('Katalog Barang / Alat')
-                    ->relationship('item', 'name')
+                    ->relationship(
+                        name: 'item',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn (Builder $query) => $query->where('type', 'tool')
+                    )
                     ->searchable()
                     ->preload()
                     ->required()
@@ -45,22 +51,20 @@ class ToolAssetsRelationManager extends RelationManager
                             ->label('Kode Barang')
                             ->placeholder('Misal: TLS-WLD-02')
                             ->required(),
+
                         TextInput::make('name')
                             ->label('Nama Barang / Mesin')
                             ->placeholder('Misal: Trafo Las 400A')
                             ->required(),
-                        Select::make('type')
-                            ->label('Tipe')
-                            ->options([
-                                'tool' => 'Tool / Aset',
-                                'consumable' => 'Consumable',
-                            ])
-                            ->default('tool')
-                            ->required(),
+
+                        Hidden::make('type')
+                            ->default('tool'),
+
                         TextInput::make('unit')
                             ->label('Satuan')
                             ->default('Unit')
                             ->required(),
+
                         TextInput::make('minimum_stock')
                             ->label('Batas Minimum Stok')
                             ->numeric()
@@ -125,6 +129,13 @@ class ToolAssetsRelationManager extends RelationManager
                     ->label('Nama Alat / Mesin')
                     ->weight('bold')
                     ->searchable(),
+
+                TextColumn::make('item.unit')
+                    ->label('Jumlah Fisik')
+                    ->badge()
+                    ->color('info')
+                    ->formatStateUsing(fn ($state) => "1 " . ($state ?: 'Unit'))
+                    ->alignCenter(),
 
                 TextColumn::make('serial_number')
                     ->label('Serial Number')
