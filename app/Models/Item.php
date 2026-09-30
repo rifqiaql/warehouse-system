@@ -21,4 +21,16 @@ class Item extends Model
     {
         return $this->hasMany(ConsumableStock::class);
     }
+
+    /**
+     * Hitung total stok riil otomatis (Tool dihitung per unit fisik, Consumable dijumlahkan quantity-nya)
+     */
+    public function getTotalStockAttribute(): int
+    {
+        if ($this->type === 'tool') {
+            return $this->toolAssets()->count();
+        }
+
+        return (int) $this->consumableStocks()->sum('quantity');
+    }
 }

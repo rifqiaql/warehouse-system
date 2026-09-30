@@ -150,4 +150,4 @@ class ToolAssetResource extends Resource
             'edit' => Pages\EditToolAsset::route('/{record}/edit'),
         ];
     }
-}
+}   

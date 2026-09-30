@@ -14,12 +14,21 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class ToolAssetsRelationManager extends RelationManager
 {
     protected static string $relationship = 'toolAssets';
 
-    protected static ?string $title = 'Daftar Unit Alat & Mesin di Gudang Ini';
+    /**
+     * Menampilkan counter otomatis di judul tab gudang
+     * Contoh: "Daftar Unit Alat & Mesin (3 Unit)"
+     */
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        $count = $ownerRecord->toolAssets()->count();
+        return "Daftar Unit Alat & Mesin ({$count} Unit)";
+    }
 
     public function form(Schema $schema): Schema
     {
