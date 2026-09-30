@@ -85,25 +85,29 @@ class ItemResource extends Resource
                             ->label('Gudang Masuk')
                             ->options(fn () => Warehouse::pluck('name', 'id'))
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->dehydrated(false),
 
                         // Tampil jika Consumable
                         TextInput::make('initial_quantity')
                             ->label('Jumlah Stok Awal')
                             ->numeric()
                             ->placeholder('Misal: 50')
-                            ->visible(fn ($get) => $get('type') === 'consumable'),
+                            ->visible(fn ($get) => $get('type') === 'consumable')
+                            ->dehydrated(false),
 
                         // Tampil jika Tool / Aset
                         TextInput::make('initial_asset_tag')
                             ->label('Kode Tag Unit Pertama')
                             ->placeholder('Contoh: AST-WLD-001')
-                            ->visible(fn ($get) => $get('type') === 'tool'),
+                            ->visible(fn ($get) => $get('type') === 'tool')
+                            ->dehydrated(false),
 
                         TextInput::make('initial_serial_number')
                             ->label('Nomor Seri Unit (SN)')
                             ->placeholder('Misal: SN-88912-X')
-                            ->visible(fn ($get) => $get('type') === 'tool'),
+                            ->visible(fn ($get) => $get('type') === 'tool')
+                            ->dehydrated(false),
                     ])->columns(2),
             ]);
     }
