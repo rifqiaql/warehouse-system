@@ -13,6 +13,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class ProjectResource extends Resource
@@ -78,6 +79,7 @@ class ProjectResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('start_date', 'desc')
             ->columns([
                 TextColumn::make('code')
                     ->label('Kode Proyek')
@@ -93,7 +95,8 @@ class ProjectResource extends Resource
                     ->label('Klien')
                     ->badge()
                     ->color('info')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('location')
                     ->label('Lokasi Site')
@@ -120,7 +123,24 @@ class ProjectResource extends Resource
                 TextColumn::make('start_date')
                     ->label('Tgl Mulai')
                     ->date('d M Y')
+                    ->searchable()
                     ->sortable(),
+            ])
+            ->filters([
+                SelectFilter::make('client_id')
+                    ->label('Filter Klien')
+                    ->relationship('client', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                SelectFilter::make('status')
+                    ->label('Filter Status')
+                    ->options([
+                        'planning' => 'Perencanaan (Planning)',
+                        'active' => 'Aktif / Berjalan',
+                        'completed' => 'Selesai',
+                        'suspended' => 'Ditunda / On Hold',
+                    ]),
             ])
             ->actions([
                 EditAction::make(),
