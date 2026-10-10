@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ToolAssetResource extends Resource
 {
@@ -36,7 +37,11 @@ class ToolAssetResource extends Resource
             ->components([
                 Select::make('item_id')
                     ->label('Tipe / Jenis Alat')
-                    ->relationship('item', 'name')
+                    ->relationship(
+                        name: 'item',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn (Builder $query) => $query->where('type', 'tool')
+                    )
                     ->searchable()
                     ->preload()
                     ->required(),
@@ -150,4 +155,4 @@ class ToolAssetResource extends Resource
             'edit' => Pages\EditToolAsset::route('/{record}/edit'),
         ];
     }
-}   
+}

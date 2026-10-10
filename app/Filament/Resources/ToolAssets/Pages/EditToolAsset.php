@@ -16,4 +16,12 @@ class EditToolAsset extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    /**
+     * Redirect kembali ke list/index setelah berhasil save changes
+     */
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }
