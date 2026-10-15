@@ -8,19 +8,28 @@ use App\Filament\Resources\DeliveryOrderOuts\Pages\ListDeliveryOrderOuts;
 use App\Filament\Resources\DeliveryOrderOuts\Schemas\DeliveryOrderOutForm;
 use App\Filament\Resources\DeliveryOrderOuts\Tables\DeliveryOrderOutsTable;
 use App\Models\DeliveryOrderOut;
-use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class DeliveryOrderOutResource extends Resource
 {
     protected static ?string $model = DeliveryOrderOut::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-truck';
+    }
 
-    protected static ?string $recordTitleAttribute = 'name';
+    public static function getNavigationLabel(): string
+    {
+        return 'Delivery Order Outs';
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Transaksi Logistik';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -30,13 +39,6 @@ class DeliveryOrderOutResource extends Resource
     public static function table(Table $table): Table
     {
         return DeliveryOrderOutsTable::configure($table);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array
